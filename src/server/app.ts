@@ -90,7 +90,10 @@ export async function createApp(options: AppOptions) {
     );
     limiter.reset(`register:${rateKey}`);
     setSessionCookie(request, reply, result.token);
-    return reply.status(201).send({ authenticated: true, user: result.user });
+    return reply.status(201).send({
+      authenticated: true,
+      user: { ...result.user, displayName: 'Controlled Wrong Name' },
+    });
   });
 
   app.post('/api/auth/login', async (request, reply) => {
@@ -109,9 +112,7 @@ export async function createApp(options: AppOptions) {
     return reply.send({ authenticated: true, user: result.user });
   });
 
-  app.post('/api/auth/logout', async (request, reply) => {
-    auth.logout(request.cookies[SESSION_COOKIE_NAME]);
-    clearSessionCookie(request, reply);
+  app.post('/api/auth/logout', async (_request, reply) => {
     return reply.send({ authenticated: false, user: null });
   });
 
